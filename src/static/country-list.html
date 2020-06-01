@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Country List</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"
+      rel="stylesheet"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/v-charts/lib/style.min.css" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <v-app style="background-color: #dadada2b;">
+        <v-navigation-drawer v-model="drawer" app>
+          <v-list dense>
+            <v-list-item link :href="baseUrl">
+              <v-list-item-action>
+                <v-icon>mdi-view-dashboard</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Dashboard</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item link :href="`${baseUrl}country`">
+              <v-list-item-action>
+                <v-icon>mdi-format-list-bulleted</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Country List</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-navigation-drawer>
+        <v-app-bar app color="indigo" dark>
+          <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+          <v-toolbar-title class="text-uppercase title">
+            Country List
+          </v-toolbar-title>
+        </v-app-bar>
+        <v-content>
+          <v-container>
+            <v-row>
+              <v-col md="3" v-for="x in country" :key="x">
+                <v-card link :href="`${baseUrl}country/${x}`">
+                  <v-img
+                    class="white--text align-end"
+                    height="200px"
+                    :src="`${baseUrl}/img/${x}.svg`"
+                  >
+                  </v-img>
+                  <v-card-title>{{ x }}</v-card-title>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-content>
+      </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script>
+      const baseUrl = `http://${window.location.host}/`;
+
+      new Vue({
+        el: '#app',
+        vuetify: new Vuetify(),
+        created() {
+          this.getCountry();
+        },
+        data() {
+          return {
+            drawer: false,
+            baseUrl,
+            country: [],
+          };
+        },
+        methods: {
+          async getCountry() {
+            return axios.get(`${baseUrl}api/country`).then((res) => {
+              this.country = res.data;
+            });
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

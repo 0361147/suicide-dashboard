@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"
+      rel="stylesheet"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/v-charts/lib/style.min.css" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+    />
+    <title>Suicide Dashboard</title>
+  </head>
+  <body>
+    <div id="app">
+      <v-app style="background-color: #dadada2b;">
+        <v-navigation-drawer v-model="drawer" app>
+          <v-list dense>
+            <v-list-item link :href="imgUrl">
+              <v-list-item-action>
+                <v-icon>mdi-view-dashboard</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Dashboard</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item link :href="`${imgUrl}country`">
+              <v-list-item-action>
+                <v-icon>mdi-format-list-bulleted</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Country List</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-navigation-drawer>
+        <v-app-bar app color="indigo" dark>
+          <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+          <v-toolbar-title class="text-uppercase title">
+            {{ country.replace(/%20/g, ' ') }}
+          </v-toolbar-title>
+        </v-app-bar>
+        <v-content>
+          <v-container>
+            <v-row>
+              <v-col offset-md="4" md="4">
+                <v-card>
+                  <v-img
+                    class="white--text align-end"
+                    height="200px"
+                    :src="`${imgUrl}/img/${country}.svg`"
+                  >
+                  </v-img>
+                  <v-card-title>{{ country.replace(/%20/g, ' ') }}</v-card-title>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row align="center" justify="space-around">
+              <v-col xs="12" sm="12" md="6" lg="3">
+                <v-card :loading="overview.loading" color="#C62828" dark>
+                  <v-card-title class="headline">
+                    <v-icon x-large>mdi-skull-crossbones</v-icon>
+                    <span style="padding-left: 10px;" class="text-capitalize">
+                      Suicides
+                    </span>
+                  </v-card-title>
+
+                  <v-card-subtitle>
+                    &nbsp;
+                  </v-card-subtitle>
+
+                  <v-card-text class="text-center">
+                    <span class="font-weight-bold display-2 white--text"
+                      >{{ overview.totalSuicide }}</span
+                    >
+                    <p>from {{minYear}} - {{maxYear}}</p>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col xs="12" sm="12" md="6" lg="3">
+                <v-card color="#283593" dark>
+                  <v-card-title class="headline">
+                    <v-icon x-large>mdi-gender-male</v-icon>
+                    <span style="padding-left: 10px;" class="text-capitalize">
+                      Male suicide
+                    </span>
+                  </v-card-title>
+
+                  <v-card-subtitle>
+                    &nbsp;
+                  </v-card-subtitle>
+
+                  <v-card-text class="text-center">
+                    <span class="font-weight-bold display-2 white--text"
+                      >{{ overview.maleSuicide }}</span
+                    >
+                    <p>from {{minYear}} - {{maxYear}}</p>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col xs="12" sm="12" md="6" lg="3">
+                <v-card color="#4527A0" dark>
+                  <v-card-title class="headline">
+                    <v-icon x-large>mdi-gender-female</v-icon>
+                    <span style="padding-left: 10px;" class="text-capitalize">
+                      Female suicide
+                    </span>
+                  </v-card-title>
+
+                  <v-card-subtitle>
+                    &nbsp;
+                  </v-card-subtitle>
+
+                  <v-card-text class="text-center">
+                    <span class="font-weight-bold display-2 white--text"
+                      >{{ overview.femaleSuicide }}</span
+                    >
+                    <p>from {{minYear}} - {{maxYear}}</p>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col xs="12" sm="12" md="6" lg="3">
+                <v-card color="#D84315" dark>
+                  <v-card-title class="headline">
+                    <v-icon x-large>mdi-chart-timeline-variant</v-icon>
+                    <span style="padding-left: 10px;" class="text-capitalize">
+                      Suicide Growth
+                    </span>
+                  </v-card-title>
+
+                  <v-card-subtitle>
+                    &nbsp;
+                  </v-card-subtitle>
+
+                  <v-card-text class="text-center">
+                    <span class="font-weight-bold display-2 white--text"
+                      >{{ overview.growth }}</span
+                    >
+                    <p>from {{minYear}} - {{maxYear}}</p>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row align="start" justify="center">
+              <v-col col="12">
+                <v-card>
+                  <v-card-title style="justify-content: center;">
+                    Suicide Trend
+                  </v-card-title>
+                  <v-card-actions style="justify-content: center;">
+                    <div>
+                      <v-select
+                        v-model="trendChart.splitBy"
+                        :items="trendChart.splitByList"
+                        menu-props="auto"
+                        label="Show trend by"
+                        hide-details
+                        dense
+                      ></v-select>
+                    </div>
+                  </v-card-actions>
+                  <ve-line
+                    :settings="trendChart.setting"
+                    :loading="trendChart.loading"
+                    :data="trendChart.data"
+                    :legend="trendChart.legend"
+                    :y-axis="trendChart.yAxis"
+                    :x-axis="trendChart.xAxis"
+                    :data-zoom="countChart.dataZoom"
+                  ></ve-line>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row align="start" justify="center">
+              <v-col col="12">
+                <v-card>
+                  <v-card-title style="justify-content: center;">
+                    Suicide Case Overtime
+                  </v-card-title>
+                  <v-card-actions style="justify-content: center;">
+                    <div>
+                      <v-select
+                        v-model="countChart.splitBy"
+                        :items="countChart.splitByList"
+                        menu-props="auto"
+                        label="Show case by"
+                        hide-details
+                        dense
+                      ></v-select>
+                    </div>
+                  </v-card-actions>
+                  <ve-line
+                    :settings="countChart.setting"
+                    :loading="countChart.loading"
+                    :data="countChart.data"
+                    :legend="countChart.legend"
+                    :y-axis="countChart.yAxis"
+                    :x-axis="countChart.xAxis"
+                    :data-zoom="countChart.dataZoom"
+                  ></ve-line>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col md="6">
+                <v-card>
+                  <v-card-title style="justify-content: center;">
+                    Suicide Case By Genre
+                  </v-card-title>
+                  <v-card-actions style="justify-content: center;">
+                    <div>
+                      <v-select
+                        v-model="sexChart.splitBy"
+                        :items="sexChart.splitByList"
+                        menu-props="auto"
+                        label="Show by"
+                        hide-details
+                        dense
+                      ></v-select>
+                    </div>
+                  </v-card-actions>
+                  <ve-bar
+                    :data="sexChart.data"
+                    :settings="sexChart.setting"
+                    :loading="sexChart.loading"
+                    :x-axis="sexChart.xAxis"
+                    :legend="sexChart.legend"
+                  ></ve-bar>
+                </v-card>
+              </v-col>
+              <v-col md="6">
+                <v-card>
+                  <v-card-title style="justify-content: center;">
+                    Suicide Case By Age
+                  </v-card-title>
+                  <v-card-actions style="justify-content: center;">
+                    <div>
+                      <v-select
+                        v-model="ageChart.splitBy"
+                        :items="ageChart.splitByList"
+                        menu-props="auto"
+                        label="Show by"
+                        hide-details
+                        dense
+                      ></v-select>
+                    </div>
+                  </v-card-actions>
+                  <ve-bar
+                    :data="ageChart.data"
+                    :loading="ageChart.loading"
+                    :legend="ageChart.legend"
+                    :settings="ageChart.setting"
+                    :x-axis="ageChart.xAxis"
+                  ></ve-bar>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-content>
+      </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/v-charts/lib/index.min.js"></script>
+    <script>
+      const imgUrl = `http://${window.location.host}/`;
+      const country = location.pathname.split('/')[2];
+      const baseUrl = `http://${window.location.host}/${country}/`;
+
+      new Vue({
+        el: '#app',
+        vuetify: new Vuetify(),
+        created() {
+          this.getOverview();
+          this.trendData();
+          this.countData();
+          this.sexData();
+          this.ageData();
+          this.getYear();
+        },
+        data() {
+          return {
+            drawer: false,
+            minYear: 1985,
+            maxYear: 2016,
+            imgUrl,
+            country,
+            baseUrl,
+            overview: {
+              totalSuicide: 0,
+              femaleSuicide: 0,
+              maleSuicide: 0,
+              growth: 0,
+            },
+            trendChart: {
+              dataZoom: {
+                type: 'inside',
+              },
+              yAxis: {
+                show: true,
+                name: 'Suicide / 100k people',
+                nameLocation: 'end',
+                nameTextStyle: {
+                  fontWeight: 'bold',
+                  padding: [0, -100, 0, 25],
+                  fontSize: 14,
+                },
+              },
+              xAxis: {
+                show: true,
+                type: 'category',
+                name: 'Year',
+                nameLocation: 'center',
+                nameTextStyle: {
+                  fontWeight: 'bold',
+                  padding: [25, 0, 0, 0],
+                  fontSize: 14,
+                },
+              },
+              legend: {
+                show: false,
+              },
+              loading: false,
+              splitBy: 'Total',
+              splitByList: ['Total', 'Genre', 'Age'],
+              setting: {
+                metrics: ['total'],
+                dataOrder: {
+                  label: 'year',
+                  order: 'asc',
+                },
+                yAxisType: ['KMB'],
+              },
+              data: {
+                columns: ['year', 'total'],
+                rows: [],
+              },
+            },
+            countChart: {
+              dataZoom: {
+                type: 'inside',
+              },
+              yAxis: {
+                show: true,
+                name: 'Suicide case',
+                nameLocation: 'end',
+                nameTextStyle: {
+                  fontWeight: 'bold',
+                  padding: [0, -25, 0, 25],
+                  fontSize: 14,
+                },
+                axisLabel: {
+                  formatter(value) {
+                    const res = value / 1000;
+                    return `${res}k`;
+                  },
+                },
+              },
+              xAxis: {
+                show: true,
+                type: 'category',
+                name: 'Year',
+                nameLocation: 'center',
+                nameTextStyle: {
+                  fontWeight: 'bold',
+                  padding: [25, 0, 0, 0],
+                  fontSize: 14,
+                },
+              },
+              legend: {
+                show: false,
+              },
+              loading: false,
+              splitBy: 'Total',
+              splitByList: ['Total', 'Genre', 'Age'],
+              setting: {
+                metrics: ['total'],
+                dataOrder: {
+                  label: 'year',
+                  order: 'asc',
+                },
+                yAxisType: ['KMB'],
+              },
+              data: {
+                columns: ['year', 'total'],
+                rows: [],
+              },
+            },
+            sexChart: {
+              legend: {
+                show: false,
+              },
+              xAxis: {
+                show: true,
+                type: 'value',
+                name: 'Suicide Case',
+                nameLocation: 'center',
+                nameTextStyle: {
+                  fontWeight: 'bold',
+                  padding: [25, 0, 0, 0],
+                  fontSize: 14,
+                },
+                axisLabel: {
+                  formatter(value) {
+                    let res = value / 1000;
+                    if (res >= 1000) {
+                      res = res / 1000;
+                      return `${res}m`;
+                    }
+                    return `${res}k`;
+                  },
+                },
+              },
+              setting: {
+                metrics: ['total'],
+                xAxisType: ['KMB'],
+                dataOrder: {
+                  label: 'genre',
+                  order: 'asc',
+                },
+                stack: {
+                  age: [
+                    '5-14 years',
+                    '15-24 years',
+                    '25-34 years',
+                    '35-54 years',
+                    '55-74 years',
+                    '75+ years',
+                  ],
+                },
+              },
+              legend: {
+                show: false,
+              },
+              loading: false,
+              splitBy: 'Total',
+              splitByList: ['Total', 'Age'],
+              data: {
+                columns: [
+                  'genre',
+                  '5-14 years',
+                  '15-24 years',
+                  '25-34 years',
+                  '35-54 years',
+                  '55-74 years',
+                  '75+ years',
+                  'total',
+                ],
+                rows: [],
+              },
+            },
+            ageChart: {
+              xAxis: {
+                show: true,
+                type: 'value',
+                name: 'Suicide Case',
+                nameLocation: 'center',
+                nameTextStyle: {
+                  fontWeight: 'bold',
+                  padding: [25, 0, 0, 0],
+                  fontSize: 14,
+                },
+                axisLabel: {
+                  formatter(value) {
+                    let res = value / 1000;
+                    if (res >= 1000) {
+                      res = res / 1000;
+                      return `${res}m`;
+                    }
+                    return `${res}k`;
+                  },
+                },
+              },
+              splitBy: 'Total',
+              splitByList: ['Total', 'Genre'],
+              setting: {
+                metrics: ['total'],
+                xAxisType: ['KMB'],
+                dataOrder: {
+                  label: 'total',
+                  order: 'asc',
+                },
+                stack: {
+                  genre: ['male', 'female'],
+                },
+              },
+              legend: {
+                show: false,
+              },
+              loading: false,
+              data: {
+                columns: ['age', 'value', 'male', 'female'],
+                rows: [],
+              },
+            },
+          };
+        },
+        watch: {
+          'topChart.splitByGenre'(nextVal) {
+            const metrics = this.topChart.setting.metrics;
+            metrics.splice(0, 2);
+            if (nextVal) {
+              metrics.push('female', 'male');
+            } else {
+              metrics.push('total');
+            }
+          },
+          'trendChart.splitBy'(nextVal) {
+            this.trendData(nextVal);
+          },
+          'countChart.splitBy'(nextVal) {
+            this.countData(nextVal);
+          },
+          'sexChart.splitBy'(nextVal) {
+            const t = this.sexChart;
+            if (nextVal == 'Age') {
+              t.setting.metrics = [
+                '5-14 years',
+                '15-24 years',
+                '25-34 years',
+                '35-54 years',
+                '55-74 years',
+                '75+ years',
+              ];
+            }
+
+            if (nextVal == 'Total') {
+              t.setting.metrics = ['total'];
+            }
+          },
+          'ageChart.splitBy'(nextVal) {
+            const t = this.ageChart;
+            if (nextVal == 'Genre') {
+              t.setting.metrics = ['male', 'female'];
+            }
+
+            if (nextVal == 'Total') {
+              t.setting.metrics = ['total'];
+            }
+          },
+        },
+        methods: {
+          async getOverview() {
+            const d = this.overview;
+            return axios.get(`${baseUrl}api/overview`).then((res) => {
+              d.totalSuicide = res.data.totalSuicide;
+              d.maleSuicide = res.data.maleSuicide;
+              d.femaleSuicide = res.data.femaleSuicide;
+              d.growth = res.data.growth;
+            });
+          },
+          async trendData(by = 'Total') {
+            const t = this.trendChart;
+            t.loading = true;
+
+            return axios
+              .get(`${baseUrl}api/trend`, {
+                params: {
+                  by,
+                },
+              })
+              .then((res) => {
+                t.data.rows = res.data;
+                if (by === 'Age') {
+                  t.data.columns = [
+                    'year',
+                    '5-14 years',
+                    '15-24 years',
+                    '25-34 years',
+                    '35-54 years',
+                    '55-74 years',
+                    '75+ years',
+                  ];
+                  t.setting.metrics = [
+                    '5-14 years',
+                    '15-24 years',
+                    '25-34 years',
+                    '35-54 years',
+                    '55-74 years',
+                    '75+ years',
+                  ];
+                } else if (by === 'Genre') {
+                  t.data.columns = ['year', 'male', 'female'];
+                  t.setting.metrics = ['male', 'female'];
+                } else {
+                  t.data.columns = ['year', 'total'];
+                  t.setting.metrics = ['total'];
+                }
+                t.loading = false;
+              });
+          },
+          async countData(by = 'Total') {
+            const t = this.countChart;
+            t.loading = true;
+
+            return axios
+              .get(`${baseUrl}api/count`, {
+                params: {
+                  by,
+                },
+              })
+              .then((res) => {
+                t.data.rows = res.data;
+                if (by === 'Age') {
+                  t.data.columns = [
+                    'year',
+                    '5-14 years',
+                    '15-24 years',
+                    '25-34 years',
+                    '35-54 years',
+                    '55-74 years',
+                    '75+ years',
+                  ];
+                  t.setting.metrics = [
+                    '5-14 years',
+                    '15-24 years',
+                    '25-34 years',
+                    '35-54 years',
+                    '55-74 years',
+                    '75+ years',
+                  ];
+                } else if (by === 'Genre') {
+                  t.data.columns = ['year', 'male', 'female'];
+                  t.setting.metrics = ['male', 'female'];
+                } else {
+                  t.data.columns = ['year', 'total'];
+                  t.setting.metrics = ['total'];
+                }
+                t.loading = false;
+              });
+          },
+          async sexData() {
+            const t = this.sexChart;
+            t.loading = true;
+
+            return axios.get(`${baseUrl}api/sex`).then((res) => {
+              t.data.rows = res.data;
+              t.loading = false;
+            });
+          },
+          async ageData() {
+            const t = this.ageChart;
+            t.loading = true;
+
+            return axios.get(`${baseUrl}api/age`).then((res) => {
+              t.data.rows = res.data;
+              t.loading = false;
+            });
+          },
+          async getYear() {
+            return axios.get(`${baseUrl}api/year`).then((res) => {
+              this.minYear = res.data.min;
+              this.maxYear = res.data.max;
+            });
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
