@@ -396,8 +396,8 @@ def ageDataCountry(country):
 def getYear(country):
   df = getDf(country=country)
   return jsonify({
-    'min': df['year'].min(),
-    'max': df['year'].max()
+    'min': int(df['year'].min()),
+    'max': int(df['year'].max())
   })
 
 @app.route('/api/country')
