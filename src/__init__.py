@@ -20,7 +20,7 @@ def getDf(country = None):
 
 @app.route('/')
 def index():
-  return app.send_static_file('index2.html')
+  return app.send_static_file('index.html')
 
 @app.route('/country')
 def country():
@@ -43,10 +43,13 @@ def overview():
   female_suicide = np.round(tmp['female'] / 1000)
   total_suicide = np.round(tmp.sum() / 1000)
 
-  suicide_1985 = df[df['year'] == 1985].suicides_no.sum()
-  suicide_2015 = df[df['year'] == 2015].suicides_no.sum()
+  minYear = df['year'].min()
+  maxYear = df['year'].max()
+
+  suicide_1985 = df[df['year'] == minYear].suicides_no.sum()
+  suicide_2015 = df[df['year'] == maxYear].suicides_no.sum()
   growth = suicide_2015 / suicide_1985
-  growth = growth ** 0.1
+  growth = growth ** (1 / (maxYear - minYear))
   growth = round((growth - 1) * 100, 2)
 
 
@@ -245,8 +248,10 @@ def overviewCountry(country):
   suicide_1985 = df[df['year'] == minYear].suicides_no.sum()
   suicide_2015 = df[df['year'] == maxYear].suicides_no.sum()
   growth = suicide_2015 / suicide_1985
-  growth = growth ** 0.1
+  growth = growth ** (1 / (maxYear - minYear))
   growth = round((growth - 1) * 100, 2)
+  if (np.isinf(growth)):
+    growth = 100
 
 
   return jsonify({
