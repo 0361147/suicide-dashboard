@@ -75,30 +75,27 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <script>
-      'use strict';
+      const baseUrl = `https://${window.location.host}/`;
 
-      var baseUrl = 'https://'.concat(window.location.host, '/');
       new Vue({
         el: '#app',
         vuetify: new Vuetify(),
-        created: function created() {
+        created() {
           this.getCountry();
         },
-        data: function data() {
+        data() {
           return {
             isLoading: true,
             drawer: false,
-            baseUrl: baseUrl,
+            baseUrl,
             country: [],
           };
         },
         methods: {
-          getCountry: async function getCountry() {
-            var _this = this;
-
-            return axios.get(''.concat(baseUrl, 'api/country')).then(function (res) {
-              _this.isLoading = false;
-              _this.country = res.data;
+          async getCountry() {
+            return axios.get(`${baseUrl}api/country`).then((res) => {
+              this.isLoading = false;
+              this.country = res.data;
             });
           },
         },

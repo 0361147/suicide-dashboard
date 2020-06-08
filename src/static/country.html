@@ -274,14 +274,29 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/v-charts/lib/index.min.js"></script>
     <script>
-      const imgUrl = `https://${window.location.host}/`;
-      const country = location.pathname.split('/')[2];
-      const baseUrl = `https://${window.location.host}/${country}/`;
+      'use strict';
 
+      function _defineProperty(obj, key, value) {
+        if (key in obj) {
+          Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true,
+          });
+        } else {
+          obj[key] = value;
+        }
+        return obj;
+      }
+
+      var imgUrl = 'https://'.concat(window.location.host, '/');
+      var country = location.pathname.split('/')[2];
+      var baseUrl = 'https://'.concat(window.location.host, '/').concat(country, '/');
       new Vue({
         el: '#app',
         vuetify: new Vuetify(),
-        created() {
+        created: function created() {
           this.getOverview();
           this.trendData();
           this.countData();
@@ -289,14 +304,16 @@
           this.ageData();
           this.getYear();
         },
-        data() {
+        data: function data() {
+          var _sexChart;
+
           return {
             drawer: false,
             minYear: 1985,
             maxYear: 2016,
-            imgUrl,
-            country,
-            baseUrl,
+            imgUrl: imgUrl,
+            country: country,
+            baseUrl: baseUrl,
             overview: {
               totalSuicide: 0,
               femaleSuicide: 0,
@@ -361,9 +378,9 @@
                   fontSize: 14,
                 },
                 axisLabel: {
-                  formatter(value) {
-                    const res = value / 1000;
-                    return `${res}k`;
+                  formatter: function formatter(value) {
+                    var res = value / 1000;
+                    return ''.concat(res, 'k');
                   },
                 },
               },
@@ -397,56 +414,60 @@
                 rows: [],
               },
             },
-            sexChart: {
-              legend: {
-                show: false,
-              },
-              xAxis: {
-                show: true,
-                type: 'value',
-                name: 'Suicide Case',
-                nameLocation: 'center',
-                nameTextStyle: {
-                  fontWeight: 'bold',
-                  padding: [25, 0, 0, 0],
-                  fontSize: 14,
+            sexChart:
+              ((_sexChart = {
+                legend: {
+                  show: false,
                 },
-                axisLabel: {
-                  formatter(value) {
-                    let res = value / 1000;
-                    if (res >= 1000) {
-                      res = res / 1000;
-                      return `${res}m`;
-                    }
-                    return `${res}k`;
+                xAxis: {
+                  show: true,
+                  type: 'value',
+                  name: 'Suicide Case',
+                  nameLocation: 'center',
+                  nameTextStyle: {
+                    fontWeight: 'bold',
+                    padding: [25, 0, 0, 0],
+                    fontSize: 14,
+                  },
+                  axisLabel: {
+                    formatter: function formatter(value) {
+                      var res = value / 1000;
+
+                      if (res >= 1000) {
+                        res = res / 1000;
+                        return ''.concat(res, 'm');
+                      }
+
+                      return ''.concat(res, 'k');
+                    },
                   },
                 },
-              },
-              setting: {
-                metrics: ['total'],
-                xAxisType: ['KMB'],
-                dataOrder: {
-                  label: 'genre',
-                  order: 'asc',
+                setting: {
+                  metrics: ['total'],
+                  xAxisType: ['KMB'],
+                  dataOrder: {
+                    label: 'genre',
+                    order: 'asc',
+                  },
+                  stack: {
+                    age: [
+                      '5-14 years',
+                      '15-24 years',
+                      '25-34 years',
+                      '35-54 years',
+                      '55-74 years',
+                      '75+ years',
+                    ],
+                  },
                 },
-                stack: {
-                  age: [
-                    '5-14 years',
-                    '15-24 years',
-                    '25-34 years',
-                    '35-54 years',
-                    '55-74 years',
-                    '75+ years',
-                  ],
-                },
-              },
-              legend: {
+              }),
+              _defineProperty(_sexChart, 'legend', {
                 show: false,
-              },
-              loading: false,
-              splitBy: 'Total',
-              splitByList: ['Total', 'Age'],
-              data: {
+              }),
+              _defineProperty(_sexChart, 'loading', false),
+              _defineProperty(_sexChart, 'splitBy', 'Total'),
+              _defineProperty(_sexChart, 'splitByList', ['Total', 'Age']),
+              _defineProperty(_sexChart, 'data', {
                 columns: [
                   'genre',
                   '5-14 years',
@@ -458,8 +479,8 @@
                   'total',
                 ],
                 rows: [],
-              },
-            },
+              }),
+              _sexChart),
             ageChart: {
               xAxis: {
                 show: true,
@@ -472,13 +493,15 @@
                   fontSize: 14,
                 },
                 axisLabel: {
-                  formatter(value) {
-                    let res = value / 1000;
+                  formatter: function formatter(value) {
+                    var res = value / 1000;
+
                     if (res >= 1000) {
                       res = res / 1000;
-                      return `${res}m`;
+                      return ''.concat(res, 'm');
                     }
-                    return `${res}k`;
+
+                    return ''.concat(res, 'k');
                   },
                 },
               },
@@ -507,23 +530,25 @@
           };
         },
         watch: {
-          'topChart.splitByGenre'(nextVal) {
-            const metrics = this.topChart.setting.metrics;
+          'topChart.splitByGenre': function topChartSplitByGenre(nextVal) {
+            var metrics = this.topChart.setting.metrics;
             metrics.splice(0, 2);
+
             if (nextVal) {
               metrics.push('female', 'male');
             } else {
               metrics.push('total');
             }
           },
-          'trendChart.splitBy'(nextVal) {
+          'trendChart.splitBy': function trendChartSplitBy(nextVal) {
             this.trendData(nextVal);
           },
-          'countChart.splitBy'(nextVal) {
+          'countChart.splitBy': function countChartSplitBy(nextVal) {
             this.countData(nextVal);
           },
-          'sexChart.splitBy'(nextVal) {
-            const t = this.sexChart;
+          'sexChart.splitBy': function sexChartSplitBy(nextVal) {
+            var t = this.sexChart;
+
             if (nextVal == 'Age') {
               t.setting.metrics = [
                 '5-14 years',
@@ -539,8 +564,9 @@
               t.setting.metrics = ['total'];
             }
           },
-          'ageChart.splitBy'(nextVal) {
-            const t = this.ageChart;
+          'ageChart.splitBy': function ageChartSplitBy(nextVal) {
+            var t = this.ageChart;
+
             if (nextVal == 'Genre') {
               t.setting.metrics = ['male', 'female'];
             }
@@ -551,27 +577,28 @@
           },
         },
         methods: {
-          async getOverview() {
-            const d = this.overview;
-            return axios.get(`${baseUrl}api/overview`).then((res) => {
+          getOverview: async function getOverview() {
+            var d = this.overview;
+            return axios.get(''.concat(baseUrl, 'api/overview')).then(function (res) {
               d.totalSuicide = res.data.totalSuicide;
               d.maleSuicide = res.data.maleSuicide;
               d.femaleSuicide = res.data.femaleSuicide;
               d.growth = res.data.growth;
             });
           },
-          async trendData(by = 'Total') {
-            const t = this.trendChart;
+          trendData: async function trendData() {
+            var by = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Total';
+            var t = this.trendChart;
             t.loading = true;
-
             return axios
-              .get(`${baseUrl}api/trend`, {
+              .get(''.concat(baseUrl, 'api/trend'), {
                 params: {
-                  by,
+                  by: by,
                 },
               })
-              .then((res) => {
+              .then(function (res) {
                 t.data.rows = res.data;
+
                 if (by === 'Age') {
                   t.data.columns = [
                     'year',
@@ -597,21 +624,23 @@
                   t.data.columns = ['year', 'total'];
                   t.setting.metrics = ['total'];
                 }
+
                 t.loading = false;
               });
           },
-          async countData(by = 'Total') {
-            const t = this.countChart;
+          countData: async function countData() {
+            var by = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Total';
+            var t = this.countChart;
             t.loading = true;
-
             return axios
-              .get(`${baseUrl}api/count`, {
+              .get(''.concat(baseUrl, 'api/count'), {
                 params: {
-                  by,
+                  by: by,
                 },
               })
-              .then((res) => {
+              .then(function (res) {
                 t.data.rows = res.data;
+
                 if (by === 'Age') {
                   t.data.columns = [
                     'year',
@@ -637,31 +666,32 @@
                   t.data.columns = ['year', 'total'];
                   t.setting.metrics = ['total'];
                 }
+
                 t.loading = false;
               });
           },
-          async sexData() {
-            const t = this.sexChart;
+          sexData: async function sexData() {
+            var t = this.sexChart;
             t.loading = true;
-
-            return axios.get(`${baseUrl}api/sex`).then((res) => {
+            return axios.get(''.concat(baseUrl, 'api/sex')).then(function (res) {
               t.data.rows = res.data;
               t.loading = false;
             });
           },
-          async ageData() {
-            const t = this.ageChart;
+          ageData: async function ageData() {
+            var t = this.ageChart;
             t.loading = true;
-
-            return axios.get(`${baseUrl}api/age`).then((res) => {
+            return axios.get(''.concat(baseUrl, 'api/age')).then(function (res) {
               t.data.rows = res.data;
               t.loading = false;
             });
           },
-          async getYear() {
-            return axios.get(`${baseUrl}api/year`).then((res) => {
-              this.minYear = res.data.min;
-              this.maxYear = res.data.max;
+          getYear: async function getYear() {
+            var _this = this;
+
+            return axios.get(''.concat(baseUrl, 'api/year')).then(function (res) {
+              _this.minYear = res.data.min;
+              _this.maxYear = res.data.max;
             });
           },
         },
